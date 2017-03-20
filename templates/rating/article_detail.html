@@ -1,7 +1,35 @@
 {% extends 'rating/base.html' %}
+{% load mptt_tags %}
 
 {% block content %}
     <p>{{ article.createdAt }}</p>
     <h2>{{ article.title }}</h2>
     <p>{{ article.text }}</p>
+    {% if user.is_authenticated %}
+        <button id="article_likes_count_{{ article.id }}" data-id="{{ article.id }}" data-type="article" data-csrf-token="{{ csrf_token }}" class="btn btn-mini like" type="button"><i class="icon-thumbs-up"></i> {{ article_likes }}</button>
+        <button id="article_dislikes_count_{{ article.id }}" data-id="{{ article.id }}" data-type="article" data-csrf-token="{{ csrf_token }}" class="btn btn-mini dislike" type="button"><i class="icon-thumbs-down"></i> {{ article_dislikes }}</button>
+    {% else %}
+        <button disabled id="article_likes_count_{{ article.id }}" data-id="{{ article.id }}" data-type="article" data-csrf-token="{{ csrf_token }}" class="btn btn-mini like" type="button"><i class="icon-thumbs-up"></i> {{ article_likes }}</button>
+        <button disabled id="article_dislikes_count_{{ article.id }}" data-id="{{ article.id }}" data-type="article" data-csrf-token="{{ csrf_token }}" class="btn btn-mini dislike" type="button"><i class="icon-thumbs-down"></i> {{ article_dislikes }}</button>
+    {% endif %}
+    <h3>Комментарии: </h3>
+    {% recursetree article.comments.all %}
+        <ul>
+        <li>
+            <b>{{ node.author.username }}:</b> {{ node.text }}
+            {% if user.is_authenticated %}
+                <button id="comment_likes_count_{{ node.id }}" data-id="{{ node.id }}" data-type="comment" data-csrf-token="{{ csrf_token }}" class="btn btn-mini like" type="button"><i class="icon-thumbs-up"></i> {{ comment_ratings|get_item:node.id|get_item:"likes" }}</button>
+                <button id="comment_dislikes_count_{{ node.id }}" data-id="{{ node.id }}" data-type="comment" data-csrf-token="{{ csrf_token }}" class="btn btn-mini dislike" type="button"><i class="icon-thumbs-down"></i> {{ comment_ratings|get_item:node.id|get_item:"dislikes" }}</button>
+            {% else %}
+                <button disabled id="comment_likes_count_{{ node.id }}" data-id="{{ node.id }}" data-type="comment" data-csrf-token="{{ csrf_token }}" class="btn btn-mini like" type="button"><i class="icon-thumbs-up"></i> {{ comment_ratings|get_item:node.id|get_item:"likes" }}</button>
+                <button disabled id="comment_dislikes_count_{{ node.id }}" data-id="{{ node.id }}" data-type="comment" data-csrf-token="{{ csrf_token }}" class="btn btn-mini dislike" type="button"><i class="icon-thumbs-down"></i> {{ comment_ratings|get_item:node.id|get_item:"dislikes" }}</button>
+            {% endif %}
+            {% if not node.is_leaf_node %}
+                <ul class="children">
+                    {{ children }}
+                </ul>
+            {% endif %}
+        </li>
+        </ul>
+    {% endrecursetree %}
 {% endblock %}
