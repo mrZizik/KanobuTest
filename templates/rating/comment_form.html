@@ -1,0 +1,14 @@
+{% extends 'rating/base.html' %}
+
+{% block content %}
+    <form action="{% url 'post_comment' article_id=article_id %}" method="post">
+        {% if error == "empty_text" %}
+            <h3>Ошибка: пустой комментарий!</h3>
+        {% endif %}
+        <input type="text" name="text"/>
+        <input type="hidden" name="parent_id" value="{{ parent_id }}">
+        {%  csrf_token %}
+        </br>
+        <button class="btn" type="submit">Отправить</button>
+    </form>
+{% endblock %}
