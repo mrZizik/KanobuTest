@@ -8,6 +8,7 @@
     {% if user.is_authenticated %}
         <button id="article_likes_count_{{ article.id }}" data-id="{{ article.id }}" data-type="article" data-csrf-token="{{ csrf_token }}" class="btn btn-mini like" type="button"><i class="icon-thumbs-up"></i> {{ article_likes }}</button>
         <button id="article_dislikes_count_{{ article.id }}" data-id="{{ article.id }}" data-type="article" data-csrf-token="{{ csrf_token }}" class="btn btn-mini dislike" type="button"><i class="icon-thumbs-down"></i> {{ article_dislikes }}</button>
+        </br><a class="btn comment_answer" href={% url 'post_comment' article_id=article.id %} id="{{ node.id }}">Прокомментировать</a>
     {% else %}
         <button disabled id="article_likes_count_{{ article.id }}" data-id="{{ article.id }}" data-type="article" data-csrf-token="{{ csrf_token }}" class="btn btn-mini like" type="button"><i class="icon-thumbs-up"></i> {{ article_likes }}</button>
         <button disabled id="article_dislikes_count_{{ article.id }}" data-id="{{ article.id }}" data-type="article" data-csrf-token="{{ csrf_token }}" class="btn btn-mini dislike" type="button"><i class="icon-thumbs-down"></i> {{ article_dislikes }}</button>
