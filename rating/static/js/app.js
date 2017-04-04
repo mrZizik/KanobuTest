@@ -9,9 +9,8 @@ $(document).ready(function() {
         var type = $(this).attr("data-type");
         var csrf = $(this).attr("data-csrf-token")
         $.post('/like/'+objid+'/',{"type": type, "csrfmiddlewaretoken": csrf}, function (data) {
-            var response = JSON.parse(data);
-            $('#' + type + '_likes_count_'+objid).html("<i class=\"icon-thumbs-up\"></i> " + response.likes);
-            $('#' + type + '_dislikes_count_'+objid).html("<i class=\"icon-thumbs-down\"></i> " + response.dislikes);
+            $('#' + type + '_likes_count_'+objid).html("<i class=\"icon-thumbs-up\"></i> " + data.likes);
+            $('#' + type + '_dislikes_count_'+objid).html("<i class=\"icon-thumbs-down\"></i> " + data.dislikes);
         });
     });
 
@@ -20,12 +19,9 @@ $(document).ready(function() {
         var type = $(this).attr("data-type");
         var csrf = $(this).attr("data-csrf-token")
         $.post('/dislike/'+objid+'/',{"type": type, "csrfmiddlewaretoken": csrf}, function (data) {
-            var response = JSON.parse(data);
-            $('#' + type + '_likes_count_'+objid).html("<i class=\"icon-thumbs-up\"></i> " + response.likes);
-            $('#' + type + '_dislikes_count_'+objid).html("<i class=\"icon-thumbs-down\"></i> " + response.dislikes);
+            $('#' + type + '_likes_count_'+objid).html("<i class=\"icon-thumbs-up\"></i> " + data.likes);
+            $('#' + type + '_dislikes_count_'+objid).html("<i class=\"icon-thumbs-down\"></i> " + data.dislikes);
 
         });
     });
-
-2
 });

@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 from unittest import TestCase
-from django.contrib import auth
 from django.test import Client
 from django.core.urlresolvers import reverse
-from rating.models import Article, Comment, Rate
+from rating.models import Article, Comment
 from django.contrib.auth.models import User
 
 
@@ -25,27 +24,28 @@ class TestRating(TestCase):
 
     def test_index(self):
         response = self.client.get(reverse('list'))
-        assert response.status_code == 200
+        self.assertEquals(response.status_code, 200)
 
     def test_detail_ok(self):
         response = self.client.get(reverse('detail', kwargs={"pk": 1}))
-        assert response.status_code == 200
+        self.assertEquals(response.status_code, 200)
 
     def test_detail_not_found(self):
         response = self.client.get(reverse('detail', kwargs={"pk": 2}))
-        assert response.status_code == 404
+        self.assertEquals(response.status_code, 404)
 
     def test_like(self):
         response = self.client.post(reverse('like', kwargs={"object_id": "2"}), {"type": "article"})
         print response.status_code
-        assert response.status_code == 200
+        self.assertEquals(response.status_code, 200)
 
     def test_like_not_found(self):
         response = self.client.post(reverse('like', kwargs={"object_id": "100"}), {"type": "article"})
         print response.status_code
-        assert response.status_code == 404
+        self.assertEquals(response.status_code, 404)
 
     def test_dislike_not_found(self):
         response = self.client.post(reverse('dislike', kwargs={"object_id": "100"}), {"type": "article"})
         print response.status_code
-        assert response.status_code == 404
+        self.assertEquals(response.status_code, 404)
+

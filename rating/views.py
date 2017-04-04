@@ -1,7 +1,6 @@
 from .models import Article, Rate, Comment
 from django.views.generic import ListView, DetailView
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
-from django.template.defaulttags import register
+from django.http import HttpResponseRedirect, HttpResponseNotFound, JsonResponse
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.contrib import auth
@@ -10,7 +9,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.template import RequestContext
 from .forms import CommentForm
-import json
 
 
 class ArticleListView(ListView):
@@ -25,11 +23,11 @@ class ArticleDetailView(DetailView):
         article = context['article']
         comment_ratings = {}
         for comment in article.comments.all():
-            rate = {}
-            rate["likes"] = comment.rates.filter(side=1).count()
-            rate["dislikes"] = comment.rates.filter(side=-1).count()
-            rate["rating"] = comment.rates.count()
-            comment_ratings[comment.id] = rate
+            comment_ratings[comment.id] = {
+                "likes": comment.rates.filter(side=1).count(),
+                "dislikes": comment.rates.filter(side=-1).count(),
+                "rating": comment.rates.count()
+            }
         context['comment_ratings'] = comment_ratings
         context['article_rating'] = article.rates.count()
         context['article_likes'] = article.rates.filter(side=1).count()
@@ -79,14 +77,12 @@ def like(request, object_id):
                 rate.side = 1
                 rate.save()
         else:
-
-            rate = Rate.objects.get_or_create(user=request.user, object_id=material.id,
+            Rate.objects.get_or_create(user=request.user, object_id=material.id,
                                               content_type=ContentType.objects.get_for_model(material), side=1)
-        response = {}
-        response["likes"] = material.rates.filter(side=1).count()
-        response["dislikes"] = material.rates.filter(side=-1).count()
-        response["summ"] = material.rates.count()
-        return HttpResponse(json.dumps(response))
+
+        return JsonResponse({'likes': material.rates.filter(side=1).count(),
+                             'dislikes': material.rates.filter(side=-1).count(),
+                             'summ': material.rates.count()})
     except ObjectDoesNotExist:
         return HttpResponseNotFound()
 
@@ -109,13 +105,12 @@ def dislike(request, object_id):
                 rate.side = -1
                 rate.save()
         else:
-            rate = Rate.objects.get_or_create(user=request.user, object_id=material.id,
+            Rate.objects.get_or_create(user=request.user, object_id=material.id,
                                               content_type=ContentType.objects.get_for_model(material), side=-1)
-        response = {}
-        response["likes"] = material.rates.filter(side=1).count()
-        response["dislikes"] = material.rates.filter(side=-1).count()
-        response["summ"] = material.rates.count()
-        return HttpResponse(json.dumps(response))
+        return JsonResponse({
+            "likes": material.rates.filter(side=1).count(),
+            "dislikes": material.rates.filter(side=-1).count(),
+            "summ": material.rates.count()})
     except ObjectDoesNotExist:
         return HttpResponseNotFound()
 
@@ -150,6 +145,3 @@ def post_comment(request, article_id, parent_id=None):
     return render(request, 'rating/comment_form.html', ctx)
 
 
-@register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
