@@ -1,6 +1,7 @@
 from .models import Article, Rate, Comment
 from django.views.generic import ListView, DetailView
 from django.http import HttpResponseRedirect, HttpResponseNotFound, JsonResponse
+from django.views.decorators.http import require_http_methods
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.contrib import auth
@@ -61,6 +62,7 @@ def check_rate_exist(user, material):
 
 @transaction.atomic
 @login_required
+@require_http_methods(["POST"])
 def like(request, object_id):
     material_type = request.POST.get("type")
     material = None
@@ -89,6 +91,7 @@ def like(request, object_id):
 
 @transaction.atomic
 @login_required
+@require_http_methods(["POST"])
 def dislike(request, object_id):
     material_type = request.POST.get("type")
     material = None
@@ -117,6 +120,7 @@ def dislike(request, object_id):
 
 @transaction.atomic
 @login_required
+@require_http_methods(["POST", "GET"])
 def post_comment(request, article_id, parent_id=None):
     if request.method == "POST":
         form = CommentForm(request.POST)
